@@ -3,10 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { useContacts } from "@/hooks/useContacts";
+import { MultilingualInput } from "@/components/MultilingualInput";
 import type { ContactPayload } from "@/types/contact";
 import { 
   MapPin, 
@@ -26,15 +25,14 @@ import {
 
 export default function ContactEdit() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { contact, isLoadingContact, updateContact: updateContactMutation, isUpdating } = useContacts();
   const [formData, setFormData] = useState<ContactPayload>({
     nom: "",
     email: "",
     telephone: "",
-    adresse: "",
-    ville: "",
-    wilaya: "",
+    adresse: { fr: "", ar: "", en: "" },
+    ville: { fr: "", ar: "", en: "" },
+    wilaya: { fr: "", ar: "", en: "" },
     horaires: "",
     site_web: "",
     facebook: "",
@@ -42,12 +40,35 @@ export default function ContactEdit() {
     tiktok: "",
     linkedin: "",
     x: "",
-    message_acceuil: "",
+    message_acceuil: { fr: "", ar: "", en: "" },
   });
 
   useEffect(() => {
     if (contact) {
-      setFormData(contact);
+      setFormData({
+        nom: contact.nom || "",
+        email: contact.email,
+        telephone: contact.telephone,
+        adresse: typeof contact.adresse === 'object' && contact.adresse !== null 
+          ? contact.adresse 
+          : { fr: "", ar: "", en: "" },
+        ville: typeof contact.ville === 'object' && contact.ville !== null 
+          ? contact.ville 
+          : { fr: "", ar: "", en: "" },
+        wilaya: typeof contact.wilaya === 'object' && contact.wilaya !== null 
+          ? contact.wilaya 
+          : { fr: "", ar: "", en: "" },
+        horaires: contact.horaires,
+        site_web: contact.site_web || "",
+        facebook: contact.facebook || "",
+        instagram: contact.instagram || "",
+        tiktok: contact.tiktok || "",
+        linkedin: contact.linkedin || "",
+        x: contact.x || "",
+        message_acceuil: typeof contact.message_acceuil === 'object' && contact.message_acceuil !== null
+          ? contact.message_acceuil
+          : { fr: "", ar: "", en: "" },
+      });
     }
   }, [contact]);
 
@@ -60,13 +81,6 @@ export default function ContactEdit() {
     } catch (error) {
       // Error handling is done in the hook
     }
-  };
-
-  const handleChange = (field: keyof ContactPayload, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value || null
-    }));
   };
 
   if (isLoadingContact) {
@@ -110,7 +124,7 @@ export default function ContactEdit() {
                 <Input
                   id="nom"
                   value={formData.nom || ""}
-                  onChange={(e) => handleChange("nom", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, nom: e.target.value }))}
                   placeholder="Enter organization name"
                   maxLength={255}
                 />
@@ -126,7 +140,7 @@ export default function ContactEdit() {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="contact@example.com"
                   maxLength={254}
                 />
@@ -142,7 +156,7 @@ export default function ContactEdit() {
                   type="tel"
                   required
                   value={formData.telephone}
-                  onChange={(e) => handleChange("telephone", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, telephone: e.target.value }))}
                   placeholder="+213 XXX XXX XXX"
                   maxLength={128}
                 />
@@ -157,7 +171,7 @@ export default function ContactEdit() {
                   id="horaires"
                   required
                   value={formData.horaires}
-                  onChange={(e) => handleChange("horaires", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, horaires: e.target.value }))}
                   placeholder="Mon-Fri: 9:00 AM - 5:00 PM"
                   maxLength={255}
                 />
@@ -172,58 +186,59 @@ export default function ContactEdit() {
                 <MapPin className="h-5 w-5 text-primary" />
                 Location Details
               </CardTitle>
-              <CardDescription>Address and location information</CardDescription>
+              <CardDescription>Address and location information (multilingual)</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="adresse">Address *</Label>
-                <Input
-                  id="adresse"
-                  required
-                  value={formData.adresse}
-                  onChange={(e) => handleChange("adresse", e.target.value)}
-                  placeholder="Street address"
-                  maxLength={255}
-                />
-              </div>
+              <MultilingualInput
+                label="Address"
+                value={formData.adresse}
+                onChange={(value) => setFormData(prev => ({ ...prev, adresse: value }))}
+                required
+                maxLength={255}
+                placeholder={{ 
+                  fr: "Adresse en français", 
+                  ar: "العنوان بالعربية", 
+                  en: "Address in English" 
+                }}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="ville">City *</Label>
-                <Input
-                  id="ville"
-                  required
-                  value={formData.ville}
-                  onChange={(e) => handleChange("ville", e.target.value)}
-                  placeholder="City name"
-                  maxLength={100}
-                />
-              </div>
+              <MultilingualInput
+                label="City"
+                value={formData.ville}
+                onChange={(value) => setFormData(prev => ({ ...prev, ville: value }))}
+                required
+                maxLength={100}
+                placeholder={{ 
+                  fr: "Ville en français", 
+                  ar: "المدينة بالعربية", 
+                  en: "City in English" 
+                }}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="wilaya">Wilaya *</Label>
-                <Input
-                  id="wilaya"
-                  required
-                  value={formData.wilaya}
-                  onChange={(e) => handleChange("wilaya", e.target.value)}
-                  placeholder="Wilaya name"
-                  maxLength={100}
-                />
-              </div>
+              <MultilingualInput
+                label="Wilaya"
+                value={formData.wilaya}
+                onChange={(value) => setFormData(prev => ({ ...prev, wilaya: value }))}
+                required
+                maxLength={100}
+                placeholder={{ 
+                  fr: "Wilaya en français", 
+                  ar: "الولاية بالعربية", 
+                  en: "Wilaya in English" 
+                }}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="message_acceuil" className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Welcome Message
-                </Label>
-                <Textarea
-                  id="message_acceuil"
-                  value={formData.message_acceuil || ""}
-                  onChange={(e) => handleChange("message_acceuil", e.target.value)}
-                  placeholder="Welcome message for visitors"
-                  rows={3}
-                />
-              </div>
+              <MultilingualInput
+                label="Welcome Message"
+                value={formData.message_acceuil || { fr: "", ar: "", en: "" }}
+                onChange={(value) => setFormData(prev => ({ ...prev, message_acceuil: value }))}
+                type="textarea"
+                placeholder={{ 
+                  fr: "Message d'accueil en français", 
+                  ar: "رسالة الترحيب بالعربية", 
+                  en: "Welcome message in English" 
+                }}
+              />
             </CardContent>
           </Card>
         </div>
@@ -248,7 +263,7 @@ export default function ContactEdit() {
                   id="site_web"
                   type="url"
                   value={formData.site_web || ""}
-                  onChange={(e) => handleChange("site_web", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, site_web: e.target.value }))}
                   placeholder="https://example.com"
                   maxLength={200}
                 />
@@ -263,7 +278,7 @@ export default function ContactEdit() {
                   id="facebook"
                   type="url"
                   value={formData.facebook || ""}
-                  onChange={(e) => handleChange("facebook", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, facebook: e.target.value }))}
                   placeholder="https://facebook.com/..."
                   maxLength={200}
                 />
@@ -278,7 +293,7 @@ export default function ContactEdit() {
                   id="instagram"
                   type="url"
                   value={formData.instagram || ""}
-                  onChange={(e) => handleChange("instagram", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, instagram: e.target.value }))}
                   placeholder="https://instagram.com/..."
                   maxLength={200}
                 />
@@ -293,7 +308,7 @@ export default function ContactEdit() {
                   id="tiktok"
                   type="url"
                   value={formData.tiktok || ""}
-                  onChange={(e) => handleChange("tiktok", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, tiktok: e.target.value }))}
                   placeholder="https://tiktok.com/@..."
                   maxLength={200}
                 />
@@ -308,7 +323,7 @@ export default function ContactEdit() {
                   id="linkedin"
                   type="url"
                   value={formData.linkedin || ""}
-                  onChange={(e) => handleChange("linkedin", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, linkedin: e.target.value }))}
                   placeholder="https://linkedin.com/company/..."
                   maxLength={200}
                 />
@@ -323,7 +338,7 @@ export default function ContactEdit() {
                   id="x"
                   type="url"
                   value={formData.x || ""}
-                  onChange={(e) => handleChange("x", e.target.value)}
+                  onChange={(e) => setFormData(prev => ({ ...prev, x: e.target.value }))}
                   placeholder="https://x.com/..."
                   maxLength={200}
                 />

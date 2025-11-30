@@ -24,8 +24,8 @@ const contentItems = [
     url: "/content/contact", 
     icon: Phone,
     items: [
-      { title: "View Contact", url: "/content/contact" },
-      { title: "All Contacts", url: "/content/contact/all" },
+      { title: "My Contact", url: "/content/contact" },
+      { title: "Add Contact", url: "/content/contact/create" },
     ]
   },
   { 

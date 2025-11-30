@@ -24,7 +24,7 @@ export const getAllContacts = async (): Promise<ContactResponse[]> => {
 
 export const getContact = async (): Promise<ContactResponse> => {
   const accessToken = localStorage.getItem("accessToken");
-  const response = await fetch(`${ADMINS_URL}/contacte/`, {
+  const response = await fetch(`${API_BASE_URL}/home/contacte/`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

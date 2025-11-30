@@ -84,7 +84,15 @@ export default function ContactList() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-foreground">{contact.message_acceuil}</p>
+            {typeof contact.message_acceuil === 'object' && contact.message_acceuil !== null ? (
+              <div className="space-y-2">
+                <div className="text-sm"><span className="font-medium">FR:</span> {contact.message_acceuil.fr}</div>
+                <div className="text-sm"><span className="font-medium">AR:</span> {contact.message_acceuil.ar}</div>
+                <div className="text-sm"><span className="font-medium">EN:</span> {contact.message_acceuil.en}</div>
+              </div>
+            ) : (
+              <p className="text-foreground">{contact.message_acceuil as any}</p>
+            )}
           </CardContent>
         </Card>
       )}
@@ -152,10 +160,26 @@ export default function ContactList() {
           <CardContent className="space-y-4">
             <div className="space-y-2 p-4 rounded-lg bg-muted/50">
               <div className="flex items-center gap-2">
-                <Badge variant="secondary">{contact.wilaya}</Badge>
-                <Badge variant="outline">{contact.ville}</Badge>
+                {typeof contact.wilaya === 'object' && contact.wilaya !== null ? (
+                  <Badge variant="secondary">{contact.wilaya.fr}</Badge>
+                ) : (
+                  <Badge variant="secondary">{contact.wilaya as any}</Badge>
+                )}
+                {typeof contact.ville === 'object' && contact.ville !== null ? (
+                  <Badge variant="outline">{contact.ville.fr}</Badge>
+                ) : (
+                  <Badge variant="outline">{contact.ville as any}</Badge>
+                )}
               </div>
-              <p className="text-base font-medium pt-2">{contact.adresse}</p>
+              {typeof contact.adresse === 'object' && contact.adresse !== null ? (
+                <div className="space-y-1 pt-2">
+                  <p className="text-sm"><span className="font-medium">FR:</span> {contact.adresse.fr}</p>
+                  <p className="text-sm"><span className="font-medium">AR:</span> {contact.adresse.ar}</p>
+                  <p className="text-sm"><span className="font-medium">EN:</span> {contact.adresse.en}</p>
+                </div>
+              ) : (
+                <p className="text-base font-medium pt-2">{contact.adresse as any}</p>
+              )}
             </div>
           </CardContent>
         </Card>
