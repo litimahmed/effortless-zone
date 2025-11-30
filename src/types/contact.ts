@@ -1,10 +1,16 @@
+export interface MultilingualField {
+  fr: string;
+  ar: string;
+  en: string;
+}
+
 export interface ContactPayload {
   nom?: string | null;
   email: string;
   telephone: string;
-  adresse: string;
-  ville: string;
-  wilaya: string;
+  adresse: MultilingualField;
+  ville: MultilingualField;
+  wilaya: MultilingualField;
   horaires: string;
   site_web?: string | null;
   facebook?: string | null;
@@ -12,7 +18,7 @@ export interface ContactPayload {
   tiktok?: string | null;
   linkedin?: string | null;
   x?: string | null;
-  message_acceuil?: string | null;
+  message_acceuil?: MultilingualField | null;
 }
 
 export interface ContactResponse extends ContactPayload {

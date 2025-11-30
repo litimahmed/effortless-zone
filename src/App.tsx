@@ -10,7 +10,6 @@ import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import AboutUs from "./pages/AboutUs";
 import ContactList from "./pages/ContactList";
-import ContactAll from "./pages/ContactAll";
 import ContactCreate from "./pages/ContactCreate";
 import ContactEdit from "./pages/ContactEdit";
 import PartnerList from "./pages/PartnerList";
@@ -36,7 +35,6 @@ const App = () => (
           <Route path="/settings" element={<DashboardLayout><Settings /></DashboardLayout>} />
           <Route path="/content/about-us" element={<DashboardLayout><AboutUs /></DashboardLayout>} />
           <Route path="/content/contact" element={<DashboardLayout><ContactList /></DashboardLayout>} />
-          <Route path="/content/contact/all" element={<DashboardLayout><ContactAll /></DashboardLayout>} />
           <Route path="/content/contact/create" element={<DashboardLayout><ContactCreate /></DashboardLayout>} />
           <Route path="/content/contact/edit" element={<DashboardLayout><ContactEdit /></DashboardLayout>} />
           <Route path="/content/partners" element={<DashboardLayout><PartnerList /></DashboardLayout>} />
