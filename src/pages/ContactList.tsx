@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,13 +16,17 @@ import {
   Edit,
   Plus,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  Languages
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { MultilingualField } from "@/types/contact";
 
 export default function ContactList() {
   const navigate = useNavigate();
   const { contact, isLoadingContact: loading } = useContacts();
+  const [selectedLang, setSelectedLang] = useState<"fr" | "ar" | "en">("fr");
 
   if (loading) {
     return (
@@ -76,22 +81,43 @@ export default function ContactList() {
       </div>
 
       {contact.message_acceuil && (
-        <Card className="shadow-elegant border-primary/20 bg-gradient-to-br from-primary/5 to-background">
-          <CardHeader>
+        <Card className="shadow-elegant border-primary/20 bg-gradient-to-br from-primary/5 via-primary/10 to-background overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <CardHeader className="relative">
             <CardTitle className="flex items-center gap-2 text-primary">
               <Building2 className="h-5 w-5" />
               Welcome Message
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             {typeof contact.message_acceuil === 'object' && contact.message_acceuil !== null ? (
-              <div className="space-y-2">
-                <div className="text-sm"><span className="font-medium">FR:</span> {contact.message_acceuil.fr}</div>
-                <div className="text-sm"><span className="font-medium">AR:</span> {contact.message_acceuil.ar}</div>
-                <div className="text-sm"><span className="font-medium">EN:</span> {contact.message_acceuil.en}</div>
-              </div>
+              <Tabs value={selectedLang} onValueChange={(v) => setSelectedLang(v as "fr" | "ar" | "en")} className="w-full">
+                <TabsList className="grid w-full max-w-md grid-cols-3 mb-4">
+                  <TabsTrigger value="fr" className="gap-2">
+                    <span className="text-xs font-semibold">🇫🇷</span>
+                    Français
+                  </TabsTrigger>
+                  <TabsTrigger value="ar" className="gap-2">
+                    <span className="text-xs font-semibold">🇩🇿</span>
+                    العربية
+                  </TabsTrigger>
+                  <TabsTrigger value="en" className="gap-2">
+                    <span className="text-xs font-semibold">🇬🇧</span>
+                    English
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="fr" className="animate-fade-in">
+                  <p className="text-lg font-medium leading-relaxed">{contact.message_acceuil.fr}</p>
+                </TabsContent>
+                <TabsContent value="ar" className="animate-fade-in" dir="rtl">
+                  <p className="text-lg font-medium leading-relaxed">{contact.message_acceuil.ar}</p>
+                </TabsContent>
+                <TabsContent value="en" className="animate-fade-in">
+                  <p className="text-lg font-medium leading-relaxed">{contact.message_acceuil.en}</p>
+                </TabsContent>
+              </Tabs>
             ) : (
-              <p className="text-foreground">{contact.message_acceuil as any}</p>
+              <p className="text-foreground text-lg">{contact.message_acceuil as any}</p>
             )}
           </CardContent>
         </Card>
@@ -149,38 +175,84 @@ export default function ContactList() {
         </Card>
 
         {/* Location */}
-        <Card className="shadow-elegant">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary" />
-              Location
-            </CardTitle>
+        <Card className="shadow-elegant overflow-hidden relative group">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <CardHeader className="relative">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <MapPin className="h-5 w-5 text-primary" />
+                </div>
+                Location
+              </CardTitle>
+              <Badge variant="outline" className="gap-1.5">
+                <Languages className="h-3 w-3" />
+                Multilingual
+              </Badge>
+            </div>
             <CardDescription>Address information</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2 p-4 rounded-lg bg-muted/50">
-              <div className="flex items-center gap-2">
-                {typeof contact.wilaya === 'object' && contact.wilaya !== null ? (
-                  <Badge variant="secondary">{contact.wilaya.fr}</Badge>
-                ) : (
-                  <Badge variant="secondary">{contact.wilaya as any}</Badge>
-                )}
-                {typeof contact.ville === 'object' && contact.ville !== null ? (
-                  <Badge variant="outline">{contact.ville.fr}</Badge>
-                ) : (
-                  <Badge variant="outline">{contact.ville as any}</Badge>
-                )}
-              </div>
-              {typeof contact.adresse === 'object' && contact.adresse !== null ? (
-                <div className="space-y-1 pt-2">
-                  <p className="text-sm"><span className="font-medium">FR:</span> {contact.adresse.fr}</p>
-                  <p className="text-sm"><span className="font-medium">AR:</span> {contact.adresse.ar}</p>
-                  <p className="text-sm"><span className="font-medium">EN:</span> {contact.adresse.en}</p>
-                </div>
+          <CardContent className="relative space-y-6">
+            {/* Region Info */}
+            <div className="flex flex-wrap gap-2">
+              {typeof contact.wilaya === 'object' && contact.wilaya !== null ? (
+                <Badge variant="secondary" className="text-sm px-3 py-1.5 gap-1.5">
+                  <MapPin className="h-3 w-3" />
+                  {contact.wilaya[selectedLang]}
+                </Badge>
               ) : (
-                <p className="text-base font-medium pt-2">{contact.adresse as any}</p>
+                <Badge variant="secondary" className="text-sm px-3 py-1.5">
+                  {contact.wilaya as any}
+                </Badge>
+              )}
+              {typeof contact.ville === 'object' && contact.ville !== null ? (
+                <Badge variant="outline" className="text-sm px-3 py-1.5">
+                  {contact.ville[selectedLang]}
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-sm px-3 py-1.5">
+                  {contact.ville as any}
+                </Badge>
               )}
             </div>
+
+            {/* Address with Language Tabs */}
+            {typeof contact.adresse === 'object' && contact.adresse !== null ? (
+              <div className="space-y-3">
+                <Tabs value={selectedLang} onValueChange={(v) => setSelectedLang(v as "fr" | "ar" | "en")} className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 h-9">
+                    <TabsTrigger value="fr" className="text-xs gap-1.5">
+                      🇫🇷 FR
+                    </TabsTrigger>
+                    <TabsTrigger value="ar" className="text-xs gap-1.5">
+                      🇩🇿 AR
+                    </TabsTrigger>
+                    <TabsTrigger value="en" className="text-xs gap-1.5">
+                      🇬🇧 EN
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="fr" className="animate-fade-in mt-4">
+                    <div className="p-4 rounded-lg bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <p className="text-base font-medium leading-relaxed">{contact.adresse.fr}</p>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="ar" className="animate-fade-in mt-4" dir="rtl">
+                    <div className="p-4 rounded-lg bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <p className="text-base font-medium leading-relaxed">{contact.adresse.ar}</p>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="en" className="animate-fade-in mt-4">
+                    <div className="p-4 rounded-lg bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                      <p className="text-base font-medium leading-relaxed">{contact.adresse.en}</p>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            ) : (
+              <div className="p-4 rounded-lg bg-muted/50 border border-border/50">
+                <p className="text-base font-medium">{contact.adresse as any}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
